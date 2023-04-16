@@ -1,5 +1,7 @@
 Interactive Annotation 🖌️✨
 
+!!! This project is under active development
+
 🎉 Welcome to the Interactive Annotation repository! 🌟 This project is all about making instance segmentation more accessible and enjoyable for everyone. Whether you're a seasoned expert or a newbie in the world of image segmentation, you'll find this tool super handy and fun to use. Let's create an amazing annotation experience together! 🚀
 
 🌠 Features
