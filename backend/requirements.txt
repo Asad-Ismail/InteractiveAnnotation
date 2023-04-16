@@ -4,3 +4,8 @@ pycocotools
 matplotlib
 onnxruntime
 onnx
+flask
+flask_cors
+flask-socketio
+torch 
+torchvision
