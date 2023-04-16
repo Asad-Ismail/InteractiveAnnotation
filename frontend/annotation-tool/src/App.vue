@@ -61,12 +61,14 @@ export default {
           brush_size: this.brushSize,
         });
 
+        // eslint-disable-next-line no-unused-vars
         const segmentationData = response.data;
         // Update the visualization based on the segmentationData
       } catch (error) {
         console.error("Error fetching segmentation data:", error);
       }
     },
+
   },
 };
 </script>
