@@ -54,6 +54,7 @@ export default {
       imageUrls: [],
       newClassName: "",
       currentIndex: 0,
+      debounceTimeout: null,
     };
   },
   methods: {
@@ -63,14 +64,25 @@ export default {
     setCurrentIndex(index) {
     this.currentIndex = index;
   },
+  async sendImageToBackend() {
+  try {
+    await axios.post("http://localhost:5000/api/load_image", {
+      image: this.imageUrls[this.currentIndex],
+    });
+  } catch (error) {
+    console.error("Error sending image to backend:", error);
+  }
+  },
   previousImage() {
     if (this.currentIndex > 0) {
       this.currentIndex--;
+      this.sendImageToBackend();
     }
   },
   nextImage() {
     if (this.currentIndex < this.imageUrls.length - 1) {
       this.currentIndex++;
+      this.sendImageToBackend();
     }
   },
     loadImages(event) {
@@ -81,6 +93,7 @@ export default {
           const reader = new FileReader();
           reader.onload = (e) => {
             this.imageUrls.push(e.target.result);
+            this.sendImageToBackend(); // Add this line to send the image to the backend
           };
           reader.readAsDataURL(file);
         }
@@ -104,7 +117,9 @@ export default {
       }
     }
   },
-    async onMouseMove(event) {
+  onMouseMove(event) {
+    clearTimeout(this.debounceTimeout);
+    this.debounceTimeout = setTimeout(async () => {
       const image = this.$refs.image;
       const rect = image.getBoundingClientRect();
       const scaleX = image.naturalWidth / rect.width;
@@ -119,7 +134,6 @@ export default {
       // Request segmentation data from the Flask backend
       try {
         const response = await axios.post("http://localhost:5000/api/segmentation", {
-          image: this.imageUrls[this.currentIndex],
           x: imageX,
           y: imageY,
           class: this.selectedClass,
@@ -130,9 +144,9 @@ export default {
       } catch (error) {
         console.error("Error fetching segmentation data:", error);
       }
-    },
-
-    addClass() {
+    },500); // 500ms debounce
+  },
+  addClass() {
       if (this.newClassName.trim() !== "" && !this.classNames.includes(this.newClassName.trim())) {
         this.classNames.push(this.newClassName.trim());
         this.newClassName = "";
