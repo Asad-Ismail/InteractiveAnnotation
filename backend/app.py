@@ -70,7 +70,14 @@ def get_segmentation():
 
     # Process the image, x, y, and selected_class to get the segmentation mask
     mask = process_image_continuous(img, x, y, selected_class)
-
+    mask=mask.squeeze(0)
+    print(f"Image shape is {img.shape}")
+    print(f"Mask shape is {mask.shape}")
+    # Add these lines for debugging
+    if not mask.any():
+        print("Warning: mask is empty")
+    else:
+        print("Returning a non-empty mask")
     # Convert the mask to a JSON object and return it
     mask_data = mask.tolist()
     return jsonify(mask_data)
@@ -81,7 +88,6 @@ def process_image_continuous(image, x, y, selected_class):
     # For demonstration purposes, we create a dummy mask of the same size as the image
     #dummy_mask = np.zeros((height, width), dtype=np.uint8)
     mask=get_mask(image,[[x,y]],[1])
-
     # Return the mask (replace this with your actual mask)
     return mask
 

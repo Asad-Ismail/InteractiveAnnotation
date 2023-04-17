@@ -10,14 +10,18 @@ print("PyTorch version:", torch.__version__)
 print("Torchvision version:", torchvision.__version__)
 print("CUDA is available:", torch.cuda.is_available())
 
-def show_mask(mask, ax, random_color=False):
+def show_mask(mask, ax=None, random_color=False):
     if random_color:
         color = np.concatenate([np.random.random(3), np.array([0.6])], axis=0)
     else:
         color = np.array([30/255, 144/255, 255/255, 0.6])
     h, w = mask.shape[-2:]
     mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
-    ax.imshow(mask_image)
+    
+    if ax:
+        ax.imshow(mask_image)
+    else:
+        cv2.imwrite("images/mask.png", (mask_image*255).astype(np.uint8))
     
 def show_points(coords, labels, ax, marker_size=375):
     pos_points = coords[labels==1]
@@ -48,6 +52,7 @@ def get_mask(image,point,label):
     point_labels=input_label,
     multimask_output=False,)
     print(f"Finished Forward path!")
+    #show_mask(masks)
     return masks
 
 if __name__=="__main__":

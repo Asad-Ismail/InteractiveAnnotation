@@ -34,11 +34,16 @@
         />
       </div>
       <div class="selected-image">
-        <button @click="previousImage">&#8249;</button>
-        <canvas ref="canvas" width="300" height="300"></canvas>
-        <img ref="image" :src="imageUrls[currentIndex]" @mousemove="onMouseMove" />
-        <button @click="nextImage">&#8250;</button>
+        <div class="image-navigation">
+          <button @click="previousImage">&#8249;</button>
+          <div class="image-container">
+            <img ref="image" :src="imageUrls[currentIndex]" @mousemove="onMouseMove" style="z-index: 1;" />
+            <canvas ref="canvas" width="0" height="0" @mousemove="onMouseMove" style="z-index: 2;"></canvas>
+          </div>
+          <button @click="nextImage">&#8250;</button>
+        </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -57,6 +62,13 @@ export default {
       debounceTimeout: null,
     };
   },
+  mounted() {
+  window.addEventListener("keydown", this.handleKeydown);
+  },
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.handleKeydown);
+  },
+
   methods: {
     submitForm() {
       console.log("Selected class:", this.selectedClass);
@@ -75,12 +87,14 @@ export default {
   },
   previousImage() {
     if (this.currentIndex > 0) {
+      this.clearCanvas(); // Add this line to clear the canvas
       this.currentIndex--;
       this.sendImageToBackend();
     }
   },
   nextImage() {
     if (this.currentIndex < this.imageUrls.length - 1) {
+      this.clearCanvas(); // Add this line to clear the canvas
       this.currentIndex++;
       this.sendImageToBackend();
     }
@@ -99,24 +113,71 @@ export default {
         }
       }
     },
-      // New method to draw the mask data on the canvas
-  drawMask(maskData) {
+    clearCanvas() {
     const canvas = this.$refs.canvas;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    handleKeydown(event) {
+    if (event.key === "ArrowRight") {
+      this.nextImage();
+    } else if (event.key === "ArrowLeft") {
+      this.previousImage();
+    }
+    },
+      // New method to draw the mask data on the canvas
+    drawMask(maskData) {
+    if (!maskData || maskData.length === 0) {
+      console.error("Mask data is empty or undefined");
+      return;
+    }
+
+    //console.log('maskData:', maskData); // Add this line to log the mask data
+
+    const image = this.$refs.image;
+    const rect = image.getBoundingClientRect();
+    const scaleX = image.naturalWidth / rect.width;
+    const scaleY = image.naturalHeight / rect.height;
+
+    const canvas = this.$refs.canvas;
+    canvas.width = image.width;
+    canvas.height = image.height;
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
     const height = canvas.height;
+    const selectedClassColor = 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
+
+    //console.log(`Canvas width and height are: ${width} / ${height}`); 
+    //console.log(`Image width and height are: ${image.width} / ${image.height}`); 
+    //console.log(`Scale X and Y are : ${scaleX} / ${scaleY}`); 
 
     ctx.clearRect(0, 0, width, height);
+
+    // Add variables to count the number of mask pixels drawn
+    let drawnPixels = 0;
+    let totalPixels = 0;
+
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < width; j++) {
-        const maskValue = maskData[i][j];
-        if (maskValue > 0) {
-          ctx.fillStyle = this.classColors[maskValue - 1];
+        // Get the corresponding mask data based on scaleX and scaleY
+        const maskX = Math.round(j * scaleX);
+        const maskY = Math.round(i * scaleY);
+        const maskValue = maskData[maskY][maskX];
+
+        if (maskValue) {
+          ctx.fillStyle = selectedClassColor; // Use the selected class color for the boolean mask
           ctx.fillRect(j, i, 1, 1);
+          drawnPixels++; // Increment drawnPixels
         }
+        totalPixels++; // Increment totalPixels
       }
     }
+
+    console.log('Mask drawn on canvas.'); // Log message for mask drawing
+    // Log the number of drawn mask pixels
+    console.log(`Drawn pixels: ${drawnPixels} / ${totalPixels}`);
   },
+
   onMouseMove(event) {
     clearTimeout(this.debounceTimeout);
     this.debounceTimeout = setTimeout(async () => {
@@ -140,6 +201,8 @@ export default {
         });
 
         const segmentationData = response.data;
+        // Add this line for debugging
+        console.log("Received mask data:", segmentationData);
         this.drawMask(segmentationData);
       } catch (error) {
         console.error("Error fetching segmentation data:", error);
@@ -239,13 +302,14 @@ export default {
   align-items: center;
   }
   .selected-image {
-    width: 100%;
-    height: calc(100vh - 4rem);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: auto;
-  }
+  width: 100%;
+  height: calc(100vh - 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  position: relative; /* Add this line */
+}
   input[type="file"] {
     margin-bottom: 1rem;
   }
@@ -294,11 +358,23 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 1rem;
-}
-
-.logo img {
+  }
+  .logo img {
   max-width: 80%;
   max-height: 80px;
+  }
+
+.selected-image img,
+.selected-image canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: 100%;
+  max-height: calc(100vh - 4rem);
+  object-fit: contain;
+  z-index: 1;
 }
+
+
 </style>
 
