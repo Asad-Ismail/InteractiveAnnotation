@@ -35,11 +35,13 @@ def get_segmentation():
     y = data['y']
     selected_class = data['class']
     
-    logging.info(f"Received parameters: image_url={image_url[:50]}")
+    logging.info(f"Received parameters: image_url={image_url[:50]}..., x={x}, y={y}, class={selected_class}")
                  
     # Convert the image URL to a PIL image
     image_data = base64.b64decode(image_url.split(",")[-1])
     image = Image.open(io.BytesIO(image_data))
+    # Save the image in a different format (e.g., PNG)
+image.save("path/to/output/image.png", "PNG")
 
     # Process the image, x, y, and selected_class to get the segmentation mask
     mask = process_image(image, x, y, selected_class)
