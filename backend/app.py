@@ -69,7 +69,7 @@ def get_segmentation():
     cv2.imwrite("images/test.png", vis_img)
 
     # Process the image, x, y, and selected_class to get the segmentation mask
-    mask = process_image(img, x, y, selected_class)
+    mask = process_image_continuous(img, x, y, selected_class)
 
     # Convert the mask to a JSON object and return it
     mask_data = mask.tolist()
