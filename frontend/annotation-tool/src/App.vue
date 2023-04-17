@@ -2,7 +2,7 @@
   <div id="app">
     <div class="sidebar">
       <div class="logo">
-        <img src="path/to/your/logo.png" alt="Your Logo">
+        <img :src="require('@/assets/logo.jpeg')" alt="Your Logo">
       </div>
       <h2>Create New Class</h2>
       <form @submit.prevent="addClass">
@@ -247,6 +247,7 @@ export default {
   .selected-image button:focus {
     outline: none;
   }
+
   .logo {
   display: flex;
   justify-content: center;
