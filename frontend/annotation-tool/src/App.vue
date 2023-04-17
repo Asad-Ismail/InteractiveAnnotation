@@ -35,6 +35,7 @@
       </div>
       <div class="selected-image">
         <button @click="previousImage">&#8249;</button>
+        <canvas ref="canvas" width="300" height="300"></canvas>
         <img ref="image" :src="imageUrls[currentIndex]" @mousemove="onMouseMove" />
         <button @click="nextImage">&#8250;</button>
       </div>
@@ -85,26 +86,52 @@ export default {
         }
       }
     },
+      // New method to draw the mask data on the canvas
+  drawMask(maskData) {
+    const canvas = this.$refs.canvas;
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+    for (let i = 0; i < height; i++) {
+      for (let j = 0; j < width; j++) {
+        const maskValue = maskData[i][j];
+        if (maskValue > 0) {
+          ctx.fillStyle = this.classColors[maskValue - 1];
+          ctx.fillRect(j, i, 1, 1);
+        }
+      }
+    }
+  },
     async onMouseMove(event) {
-      const mouseX = event.clientX;
-      const mouseY = event.clientY;
+      const image = this.$refs.image;
+      const rect = image.getBoundingClientRect();
+      const scaleX = image.naturalWidth / rect.width;
+      const scaleY = image.naturalHeight / rect.height;
+
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      const imageX = Math.round(mouseX * scaleX);
+      const imageY = Math.round(mouseY * scaleY);
 
       // Request segmentation data from the Flask backend
       try {
         const response = await axios.post("http://localhost:5000/api/segmentation", {
-          image: this.imageUrls,
-          x: mouseX,
-          y: mouseY,
+          image: this.imageUrls[this.currentIndex],
+          x: imageX,
+          y: imageY,
           class: this.selectedClass,
         });
 
-        // eslint-disable-next-line no-unused-vars
         const segmentationData = response.data;
-        // Update the visualization based on the segmentationData
+        this.drawMask(segmentationData);
       } catch (error) {
         console.error("Error fetching segmentation data:", error);
       }
     },
+
     addClass() {
       if (this.newClassName.trim() !== "" && !this.classNames.includes(this.newClassName.trim())) {
         this.classNames.push(this.newClassName.trim());
