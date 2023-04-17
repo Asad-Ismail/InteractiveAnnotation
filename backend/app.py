@@ -12,8 +12,15 @@ import logging
 import signal
 import os
 from werkzeug.utils import secure_filename
+import base64
+from flask import Flask, request, jsonify
+import base64
+import io
+from PIL import Image
+import numpy as np
+import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -27,7 +34,9 @@ def get_segmentation():
     x = data['x']
     y = data['y']
     selected_class = data['class']
-
+    
+    logging.info(f"Received parameters: image_url={image_url[:50]}")
+                 
     # Convert the image URL to a PIL image
     image_data = base64.b64decode(image_url.split(",")[-1])
     image = Image.open(io.BytesIO(image_data))
