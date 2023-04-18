@@ -52,9 +52,7 @@ def get_segmentation():
     x = data['x']
     y = data['y']
     selected_class = data['class']
-    
-    logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}")
-                 
+    logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}")         
     # Convert the image URL to a PIL image
     #image_data = base64.b64decode(image_url.split(",")[-1])
     #image = Image.open(io.BytesIO(image_data))
@@ -71,8 +69,45 @@ def get_segmentation():
     # Process the image, x, y, and selected_class to get the segmentation mask
     mask = process_image_continuous(img, x, y, selected_class)
     mask=mask.squeeze(0)
-    print(f"Image shape is {img.shape}")
-    print(f"Mask shape is {mask.shape}")
+    #print(f"Image shape is {img.shape}")
+    #print(f"Mask shape is {mask.shape}")
+    # Add these lines for debugging
+    if not mask.any():
+        print("Warning: mask is empty")
+    else:
+        print("Returning a non-empty mask")
+    # Convert the mask to a JSON object and return it
+    mask_data = mask.tolist()
+    return jsonify(mask_data)
+
+@app.route('/api/annotation', methods=['POST'])
+def get_segmentation():
+    logging.info(f"Received segmentation request kkk")
+    if image is None:
+        logging.info(f"Image is None")
+        return jsonify({"Success": False, "Message": "No image loaded"})
+    img=image.copy()
+    data = request.get_json()
+    #image_url = data['image']
+    x = data['x']
+    y = data['y']
+    selected_class = data['class']
+    logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}")         
+    img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+    # Save the image in a different format (e.g., PNG)
+    point_color = (0, 0, 255)  # Red color in BGR
+    # Draw the point
+    radius = 15  # Radius of the point
+    thickness = -1  # Thickness of the point (-1 indicates a filled circle)
+    vis_img=cv2.circle(img.copy(), (x, y), radius, point_color, thickness)
+    # Save the modified image
+    cv2.imwrite("images/test.png", vis_img)
+
+    # Process the image, x, y, and selected_class to get the segmentation mask
+    mask = process_image_continuous(img, x, y, selected_class)
+    mask=mask.squeeze(0)
+    #print(f"Image shape is {img.shape}")
+    #print(f"Mask shape is {mask.shape}")
     # Add these lines for debugging
     if not mask.any():
         print("Warning: mask is empty")

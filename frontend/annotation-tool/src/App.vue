@@ -22,6 +22,10 @@
         <input type="file" id="files" multiple @change="loadImages" />
         <button type="submit">Submit</button>
       </form>
+      <div class="action-buttons">
+        <button @click="enablePreview" :class="{ active: isPreviewEnabled }">Preview</button>
+        <button @click="enableAnnotation" :class="{ active: !isPreviewEnabled }">Annotation</button>
+      </div>
     </div>
     <div class="main">
       <div class="thumbnails">
@@ -37,8 +41,8 @@
         <div class="image-navigation">
           <button @click="previousImage">&#8249;</button>
           <div class="image-container">
-            <img ref="image" :src="imageUrls[currentIndex]" @mousemove="onMouseMove" style="z-index: 1;" />
-            <canvas ref="canvas" width="0" height="0" @mousemove="onMouseMove" style="z-index: 2;"></canvas>
+            <img ref="image" :src="imageUrls[currentIndex]" @mousemove="onMouseMove" @mousedown="onMouseDown" @contextmenu.prevent style="z-index: 1;" />
+            <canvas ref="canvas" width="0" height="0" @mousemove="onMouseMove" @mousedown="onMouseDown" @contextmenu.prevent style="z-index: 2;"></canvas>
           </div>
           <button @click="nextImage">&#8250;</button>
         </div>
@@ -60,6 +64,7 @@ export default {
       newClassName: "",
       currentIndex: 0,
       debounceTimeout: null,
+      isPreviewEnabled: true,
     };
   },
   mounted() {
@@ -99,7 +104,15 @@ export default {
       this.sendImageToBackend();
     }
   },
-    loadImages(event) {
+  enablePreview() {
+    this.isPreviewEnabled = true;
+    this.clearCanvas();
+  },
+  enableAnnotation() {
+    this.isPreviewEnabled = false;
+    this.clearCanvas();
+  },
+  loadImages(event) {
       const files = event.target.files;
       if (files.length > 0) {
         this.imageUrls = [];
@@ -131,9 +144,7 @@ export default {
       console.error("Mask data is empty or undefined");
       return;
     }
-
     //console.log('maskData:', maskData); // Add this line to log the mask data
-
     const image = this.$refs.image;
     const rect = image.getBoundingClientRect();
     const scaleX = image.naturalWidth / rect.width;
@@ -146,24 +157,16 @@ export default {
     const width = canvas.width;
     const height = canvas.height;
     const selectedClassColor = 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
-
-    //console.log(`Canvas width and height are: ${width} / ${height}`); 
-    //console.log(`Image width and height are: ${image.width} / ${image.height}`); 
-    //console.log(`Scale X and Y are : ${scaleX} / ${scaleY}`); 
-
     ctx.clearRect(0, 0, width, height);
-
     // Add variables to count the number of mask pixels drawn
     let drawnPixels = 0;
     let totalPixels = 0;
-
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < width; j++) {
         // Get the corresponding mask data based on scaleX and scaleY
         const maskX = Math.round(j * scaleX);
         const maskY = Math.round(i * scaleY);
         const maskValue = maskData[maskY][maskX];
-
         if (maskValue) {
           ctx.fillStyle = selectedClassColor; // Use the selected class color for the boolean mask
           ctx.fillRect(j, i, 1, 1);
@@ -172,13 +175,13 @@ export default {
         totalPixels++; // Increment totalPixels
       }
     }
-
     console.log('Mask drawn on canvas.'); // Log message for mask drawing
     // Log the number of drawn mask pixels
     console.log(`Drawn pixels: ${drawnPixels} / ${totalPixels}`);
   },
-
   onMouseMove(event) {
+    // on mouse only works on preview mode
+    if (!this.isPreviewEnabled) return;
     clearTimeout(this.debounceTimeout);
     this.debounceTimeout = setTimeout(async () => {
       const image = this.$refs.image;
@@ -201,13 +204,51 @@ export default {
         });
 
         const segmentationData = response.data;
-        // Add this line for debugging
-        console.log("Received mask data:", segmentationData);
         this.drawMask(segmentationData);
       } catch (error) {
         console.error("Error fetching segmentation data:", error);
       }
     },500); // 500ms debounce
+  },
+  async onMouseDown(event) {
+    if (this.isPreviewEnabled) return;
+
+    const image = this.$refs.image;
+    const rect = image.getBoundingClientRect();
+    const scaleX = image.naturalWidth / rect.width;
+    const scaleY = image.naturalHeight / rect.height;
+
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const imageX = Math.round(mouseX * scaleX);
+    const imageY = Math.round(mouseY * scaleY);
+
+    let label = -1;
+
+    if (event.button === 0) {
+      label = 1;
+    } else if (event.button === 2) {
+      label = 0;
+    } else {
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/annotation", {
+        x: imageX,
+        y: imageY,
+        class: this.selectedClass,
+        label: label,
+      });
+      console.log(`Annotation sent: x=${imageX}, y=${imageY}, class=${this.selectedClass}, label=${label}`);
+      const segmentationData = response.data;
+        // Add this line for debugging
+        //console.log("Received mask data:", segmentationData);
+      this.drawMask(segmentationData);
+    } catch (error) {
+      console.error("Error sending annotation data:", error);
+    }
   },
   addClass() {
       if (this.newClassName.trim() !== "" && !this.classNames.includes(this.newClassName.trim())) {
@@ -375,6 +416,30 @@ export default {
   z-index: 1;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
 
+.action-buttons button {
+  background-color: #f6b93b;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.action-buttons button:hover {
+  background-color: #fa983a;
+}
+
+.action-buttons button.active {
+  background-color: #fa983a;
+}
 </style>
 
