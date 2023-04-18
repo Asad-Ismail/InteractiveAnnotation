@@ -31,6 +31,12 @@ def encode_mask_to_coco_rle(mask):
     rle['counts'] = rle['counts'].decode('utf-8')  # Add this line to decode the 'counts' field
     return rle
 
+def decode_coco_rle_to_mask(rle):
+    h, w = rle['size']  # Extract height and width from the RLE object
+    rle['counts'] = rle['counts'].encode('utf-8')  # Encode the 'counts' field back to bytes
+    mask = mask_util.decode(rle)  # Decode the RLE mask
+    mask = np.array(mask, dtype=np.uint8)  # Convert the mask to a NumPy array
+    return mask.reshape(h, w)  # Reshape the mask to its original dimensions (height and width)
 
 def compute_bbox(mask):
     y_indices, x_indices = np.where(mask)
