@@ -143,10 +143,21 @@ export default {
       this.previousImage();
     }
     },
-    onKeydown(event) {
+    async onKeydown(event) {
     if (event.ctrlKey && event.key === "s") {
       event.preventDefault();
       console.log("Saving Annotation and clearing clicks data:");
+      try {
+      const response = await axios.post("http://localhost:5000/api/annotation", {
+        annotations: this.clicksData,
+      });
+      console.log(`Saving Annotations sent: click data=${this.clicksData}`);
+      const segmentationData = response.data;
+      this.drawMask(segmentationData);
+    } catch (error) {
+      console.error("Error sending annotation data:", error);
+    }
+      // click annotations
       this.clicksData = [];
     }
     },
