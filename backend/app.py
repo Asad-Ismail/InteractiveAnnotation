@@ -92,7 +92,8 @@ def get_annotation():
     x = data['x']
     y = data['y']
     selected_class = data['class']
-    logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}")         
+    label=data['label']
+    logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}, label ={label}")         
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     # Save the image in a different format (e.g., PNG)
     point_color = (0, 0, 255)  # Red color in BGR
