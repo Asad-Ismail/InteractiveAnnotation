@@ -27,7 +27,10 @@ annotations=[]
 annotation_id = 0 
 
 def encode_mask_to_coco_rle(mask):
-    return mask_util.encode(np.asfortranarray(mask.astype(np.uint8)))
+    rle = mask_util.encode(np.asfortranarray(mask.astype(np.uint8)))
+    rle['counts'] = rle['counts'].decode('utf-8')  # Add this line to decode the 'counts' field
+    return rle
+
 
 def compute_bbox(mask):
     y_indices, x_indices = np.where(mask)
@@ -158,6 +161,7 @@ def get_annotation():
         annotations.append(annotation)
         annotation_id += 1
     if save_res:
+        logging.warn(f"Annotations are {annotations}")
         with open("annotations.json", "w") as f:
             json.dump(annotations, f)
             
