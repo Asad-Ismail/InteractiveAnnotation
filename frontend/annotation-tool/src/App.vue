@@ -65,13 +65,16 @@ export default {
       currentIndex: 0,
       debounceTimeout: null,
       isPreviewEnabled: true,
+      clicksData: [],
     };
   },
   mounted() {
-  window.addEventListener("keydown", this.handleKeydown);
+    window.addEventListener("keydown", this.handleKeydown);
+    document.addEventListener("keydown", this.onKeydown);
   },
   beforeUnmount() {
     window.removeEventListener("keydown", this.handleKeydown);
+    document.removeEventListener("keydown", this.onKeydown);
   },
 
   methods: {
@@ -138,7 +141,14 @@ export default {
       this.previousImage();
     }
     },
-      // New method to draw the mask data on the canvas
+    onKeydown(event) {
+    if (event.ctrlKey && event.key === "s") {
+      event.preventDefault();
+      console.log("Saving Annotation and clearing clicks data:");
+      this.clicksData = [];
+    }
+    },
+    // method to draw the mask data on the canvas
     drawMask(maskData) {
     if (!maskData || maskData.length === 0) {
       console.error("Mask data is empty or undefined");
@@ -233,13 +243,15 @@ export default {
     } else {
       return;
     }
-
+    this.clicksData.push({
+    x: imageX,
+    y: imageY,
+    class: this.selectedClass,
+    label: label,
+    });
     try {
       const response = await axios.post("http://localhost:5000/api/annotation", {
-        x: imageX,
-        y: imageY,
-        class: this.selectedClass,
-        label: label,
+        annotations: this.clicksData,
       });
       console.log(`Annotation sent: x=${imageX}, y=${imageY}, class=${this.selectedClass}, label=${label}`);
       const segmentationData = response.data;
