@@ -87,25 +87,31 @@ def get_annotation():
         logging.info(f"Image is None")
         return jsonify({"Success": False, "Message": "No image loaded"})
     img=image.copy()
-    data = request.get_json()
-    #image_url = data['image']
-    x = data['x']
-    y = data['y']
-    selected_class = data['class']
-    label=data['label']
-    logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}, label ={label}")         
+    annotations = request.get_json()["annotations"]
+    xs=[]
+    ys=[]
+    s_classes=[]
+    labels=[]
+    
+    for annotation in annotations:
+        xs.append(annotation['x'])
+        ys.append(annotation['y'])
+        s_classes.append(annotation['class'])
+        labels.append(annotation['label'])
+        
+    logging.info(f"Received parameters: x={xs}, y={ys}, class={s_classes}, label ={labels}")       
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     # Save the image in a different format (e.g., PNG)
     point_color = (0, 0, 255)  # Red color in BGR
     # Draw the point
     radius = 15  # Radius of the point
     thickness = -1  # Thickness of the point (-1 indicates a filled circle)
-    vis_img=cv2.circle(img.copy(), (x, y), radius, point_color, thickness)
+    for x,y in zip(xs,ys):
+        vis_img=cv2.circle(img.copy(), (x, y), radius, point_color, thickness)
     # Save the modified image
-    cv2.imwrite("images/test.png", vis_img)
-
+    cv2.imwrite("images/test_click.png", vis_img)
     # Process the image, x, y, and selected_class to get the segmentation mask
-    mask = process_image_continuous(img, x, y, selected_class)
+    mask = process_image_batch(img, xs, ys, labels)
     mask=mask.squeeze(0)
     #print(f"Image shape is {img.shape}")
     #print(f"Mask shape is {mask.shape}")
@@ -124,6 +130,15 @@ def process_image_continuous(image, x, y, selected_class):
     # For demonstration purposes, we create a dummy mask of the same size as the image
     #dummy_mask = np.zeros((height, width), dtype=np.uint8)
     mask=get_mask(image,[[x,y]],[1])
+    # Return the mask (replace this with your actual mask)
+    return mask
+
+def process_image_batch(image, xs, ys,labels):
+    # Your image processing and segmentation logic here
+    height, width, channels = image.shape
+    # For demonstration purposes, we create a dummy mask of the same size as the image
+    #dummy_mask = np.zeros((height, width), dtype=np.uint8)
+    mask=get_mask(image,[xs,ys],labels)
     # Return the mask (replace this with your actual mask)
     return mask
 
