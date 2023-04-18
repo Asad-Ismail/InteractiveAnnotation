@@ -78,11 +78,12 @@ export default {
     document.removeEventListener("keydown", this.onKeydown);
   },
   methods: {
-    submitForm() {
+  submitForm() {
       console.log("Selected class:", this.selectedClass);
-    },
-    setCurrentIndex(index) {
+  },
+  setCurrentIndex(index) {
     this.currentIndex = index;
+    this.sendImageToBackend(); // Add this line to send the image to the backend
   },
   async sendImageToBackend() {
   try {
