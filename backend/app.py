@@ -11,6 +11,8 @@ from PIL import Image
 import numpy as np
 import logging
 import cv2
+import pycocotools.mask as mask_util
+import json
 from run_torch_inference import *
 
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +23,19 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Start with No image
 image=None
+annotations=[]
+annotation_id = 0 
+
+def encode_mask_to_coco_rle(mask):
+    return mask_util.encode(np.asfortranarray(mask.astype(np.uint8)))
+
+def compute_bbox(mask):
+    y_indices, x_indices = np.where(mask)
+    x_min, x_max = x_indices.min(), x_indices.max()
+    y_min, y_max = y_indices.min(), y_indices.max()
+    width = x_max - x_min
+    height = y_max - y_min
+    return [float(x_min), float(y_min), float(width), float(height)]
 
 def vis_point(img,x,y):
     # Save the image in a different format (e.g., PNG)
@@ -47,10 +62,15 @@ def vis_point(img,xs,ys):
 def load_image():
     data = request.json
     global image
+    global annotations
+    global annotation_id
     logging.info(f"Loading Image")
     image_data = data["image"].split(",")[1]
     image = base64.b64decode(image_data)
     image = Image.open(io.BytesIO(image))
+    # reset annotations
+    annotations = []
+    annotation_id = 0  # Changed from annotaiton_id
     return jsonify({"success": True})
 
 @app.route('/api/segmentation', methods=['POST'])
@@ -80,23 +100,31 @@ def get_segmentation():
 
 @app.route('/api/annotation', methods=['POST'])
 def get_annotation():
-    logging.info(f"Received segmentation request kkk")
+    #logging.info(f"Received segmentation request")
+    global annotation_id
+    global annotations
     if image is None:
         logging.info(f"Image is None")
         return jsonify({"Success": False, "Message": "No image loaded"})
     img=image.copy()
-    results = request.get_json()
-    annotations=results["annotations"]
-    if "save_res" in results:
+    inputs = request.get_json()
+    anns=inputs["annotations"]
+    if "save_res" in inputs:
         save_res=True
         logging.info(f"Saving initiated!!")
     else:
         save_res=False
+    if "done_obj" in inputs:
+        done_obj=True
+        logging.info(f"Done Object!!")
+    else:
+        done_obj=False
+           
     xs=[]
     ys=[]
     s_classes=[]
     labels=[]
-    for annotation in annotations:
+    for annotation in anns:
         xs.append(annotation['x'])
         ys.append(annotation['y'])
         s_classes.append(annotation['class'])
@@ -114,6 +142,25 @@ def get_annotation():
         print("Warning: mask is empty")
     else:
         print("Returning a non-empty mask")
+        
+    if done_obj:
+        # Create an annotation in COCO format
+        bbox = compute_bbox(mask)
+        annotation = {
+            "id": annotation_id,
+            "image_name": 1,
+            "category_id": s_classes[-1],
+            "segmentation": encode_mask_to_coco_rle(mask),
+            "area": float(mask.sum()),
+            "bbox": bbox,
+            "iscrowd": 0
+        }
+        annotations.append(annotation)
+        annotation_id += 1
+    if save_res:
+        with open("annotations.json", "w") as f:
+            json.dump(annotations, f)
+            
     # Convert the mask to a JSON object and return it
     mask_data = mask.tolist()
     return jsonify(mask_data)
