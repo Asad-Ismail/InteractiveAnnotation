@@ -81,7 +81,7 @@ def get_segmentation():
     return jsonify(mask_data)
 
 @app.route('/api/annotation', methods=['POST'])
-def get_segmentation():
+def get_annotation():
     logging.info(f"Received segmentation request kkk")
     if image is None:
         logging.info(f"Image is None")
