@@ -59,7 +59,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      classNames: ["SomeClass"],
+      classNames: ["Stuff"],
       selectedClass: "",
       imageUrls: [],
       newClassName: "",
