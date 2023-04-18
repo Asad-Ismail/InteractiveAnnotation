@@ -26,6 +26,8 @@
         <button @click="enablePreview" :class="{ active: isPreviewEnabled }">Preview</button>
         <button @click="enableAnnotation" :class="{ active: !isPreviewEnabled }">Annotation</button>
       </div>
+      <button @click="undoAnnotation" class="btn btn-danger">Undo</button>
+      <button @click="clearAll" class="btn btn-warning">Clear All</button>
     </div>
     <div class="main">
       <div class="thumbnails">
@@ -147,6 +149,10 @@ export default {
       console.log("Saving Annotation and clearing clicks data:");
       this.clicksData = [];
     }
+    },
+    clearAll() {
+    this.clicksData= [];
+    // Clear canvas if needed
     },
     // method to draw the mask data on the canvas
     drawMask(maskData) {
