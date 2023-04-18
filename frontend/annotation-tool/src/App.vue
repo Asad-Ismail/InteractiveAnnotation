@@ -77,7 +77,6 @@ export default {
     window.removeEventListener("keydown", this.handleKeydown);
     document.removeEventListener("keydown", this.onKeydown);
   },
-
   methods: {
     submitForm() {
       console.log("Selected class:", this.selectedClass);
@@ -163,7 +162,21 @@ export default {
     else if (event.key === " ") {
       // Handle space key press event
       console.log("Done with current object segmentation");
-      this.drawMask(null, false);
+      event.preventDefault();
+      console.log("Saving Annotation and clearing clicks data:");
+      try {
+      const response = await axios.post("http://localhost:5000/api/annotation", {
+        annotations: this.clicksData,
+        done_obj: true,
+      });
+      console.log(`Done current Annotation sent: click data=${this.clicksData}`);
+      const segmentationData = response.data;
+      this.drawMask(segmentationData,false);
+    } catch (error) {
+      console.error("Error sending annotation data:", error);
+    }
+      // click annotations
+      this.clicksData = [];
     }
     },
     clearAll() {
@@ -171,7 +184,8 @@ export default {
     // Clear canvas if needed
     },
     // method to draw the mask data on the canvas
-    drawMask(maskData) {
+    drawMask(maskData,clearCanvas = true)
+    {
     if (!maskData || maskData.length === 0) {
       console.error("Mask data is empty or undefined");
       return;
@@ -189,7 +203,9 @@ export default {
     const width = canvas.width;
     const height = canvas.height;
     const selectedClassColor = 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
-    ctx.clearRect(0, 0, width, height);
+    if (clearCanvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
     // Add variables to count the number of mask pixels drawn
     let drawnPixels = 0;
     let totalPixels = 0;
@@ -211,6 +227,7 @@ export default {
     // Log the number of drawn mask pixels
     console.log(`Drawn pixels: ${drawnPixels} / ${totalPixels}`);
   },
+
   onMouseMove(event) {
     // on mouse only works on preview mode
     if (!this.isPreviewEnabled) return;
@@ -242,6 +259,7 @@ export default {
       }
     },500); // 500ms debounce
   },
+
   async onMouseDown(event) {
     if (this.isPreviewEnabled) return;
 
@@ -279,7 +297,7 @@ export default {
       const segmentationData = response.data;
       // Add this line for debugging
       //console.log("Received mask data:", segmentationData);
-      this.drawMask(segmentationData);
+      this.drawMask(segmentationData,false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
@@ -476,4 +494,3 @@ export default {
   background-color: #fa983a;
 }
 </style>
-
