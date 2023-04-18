@@ -243,8 +243,8 @@ export default {
       });
       console.log(`Annotation sent: x=${imageX}, y=${imageY}, class=${this.selectedClass}, label=${label}`);
       const segmentationData = response.data;
-        // Add this line for debugging
-        //console.log("Received mask data:", segmentationData);
+      // Add this line for debugging
+      //console.log("Received mask data:", segmentationData);
       this.drawMask(segmentationData);
     } catch (error) {
       console.error("Error sending annotation data:", error);
