@@ -49,7 +49,6 @@
           <button @click="nextImage">&#8250;</button>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -150,15 +149,21 @@ export default {
       try {
       const response = await axios.post("http://localhost:5000/api/annotation", {
         annotations: this.clicksData,
+        save_res: true,
       });
       console.log(`Saving Annotations sent: click data=${this.clicksData}`);
       const segmentationData = response.data;
-      this.drawMask(segmentationData);
+      this.drawMask(segmentationData,false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
       // click annotations
       this.clicksData = [];
+    }
+    else if (event.key === " ") {
+      // Handle space key press event
+      console.log("Done with current object segmentation");
+      this.drawMask(null, false);
     }
     },
     clearAll() {

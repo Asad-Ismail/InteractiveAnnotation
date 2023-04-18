@@ -89,6 +89,7 @@ def get_annotation():
     annotations=results["annotations"]
     if "save_res" in results:
         save_res=True
+        logging.info(f"Saving initiated!!")
     else:
         save_res=False
     xs=[]
