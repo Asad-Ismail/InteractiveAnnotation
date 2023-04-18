@@ -1,17 +1,8 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 from flask import request
-import subprocess
-import threading
-import json
-import time
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 import logging
-import signal
-import os
-from werkzeug.utils import secure_filename
 import base64
 from flask import Flask, request, jsonify
 import base64
@@ -28,7 +19,29 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Start with No image
 image=None
+
+def vis_point(img,x,y):
+    # Save the image in a different format (e.g., PNG)
+    point_color = (0, 0, 255)  # Red color in BGR
+    # Draw the point
+    radius = 15  # Radius of the point
+    thickness = -1  # Thickness of the point (-1 indicates a filled circle)
+    vis_img=cv2.circle(img.copy(), (x, y), radius, point_color, thickness)
+    # Save the modified image
+    cv2.imwrite("images/test.png", vis_img)
+    
+def vis_point(img,xs,ys):
+    # Save the image in a different format (e.g., PNG)
+    point_color = (0, 0, 255)  # Red color in BGR
+    # Draw the point
+    radius = 15  # Radius of the point
+    thickness = -1  # Thickness of the point (-1 indicates a filled circle)
+    for x,y in zip(xs,ys):
+        vis_img=cv2.circle(img.copy(), (x, y), radius, point_color, thickness)
+    # Save the modified image
+    cv2.imwrite("images/test_click.png", vis_img)
 
 @app.route("/api/load_image", methods=["POST"])
 def load_image():
@@ -53,25 +66,10 @@ def get_segmentation():
     y = data['y']
     selected_class = data['class']
     logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}")         
-    # Convert the image URL to a PIL image
-    #image_data = base64.b64decode(image_url.split(",")[-1])
-    #image = Image.open(io.BytesIO(image_data))
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-    # Save the image in a different format (e.g., PNG)
-    point_color = (0, 0, 255)  # Red color in BGR
-    # Draw the point
-    radius = 15  # Radius of the point
-    thickness = -1  # Thickness of the point (-1 indicates a filled circle)
-    vis_img=cv2.circle(img.copy(), (x, y), radius, point_color, thickness)
-    # Save the modified image
-    cv2.imwrite("images/test.png", vis_img)
-
     # Process the image, x, y, and selected_class to get the segmentation mask
     mask = process_image_continuous(img, x, y, selected_class)
     mask=mask.squeeze(0)
-    #print(f"Image shape is {img.shape}")
-    #print(f"Mask shape is {mask.shape}")
-    # Add these lines for debugging
     if not mask.any():
         print("Warning: mask is empty")
     else:
@@ -87,12 +85,16 @@ def get_annotation():
         logging.info(f"Image is None")
         return jsonify({"Success": False, "Message": "No image loaded"})
     img=image.copy()
-    annotations = request.get_json()["annotations"]
+    results = request.get_json()
+    annotations=results["annotations"]
+    if "save_res" in results:
+        save_res=True
+    else:
+        save_res=False
     xs=[]
     ys=[]
     s_classes=[]
     labels=[]
-    
     for annotation in annotations:
         xs.append(annotation['x'])
         ys.append(annotation['y'])
@@ -101,15 +103,6 @@ def get_annotation():
         
     logging.info(f"Received parameters: x={xs}, y={ys}, class={s_classes}, label ={labels}")       
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-    # Save the image in a different format (e.g., PNG)
-    point_color = (0, 0, 255)  # Red color in BGR
-    # Draw the point
-    radius = 15  # Radius of the point
-    thickness = -1  # Thickness of the point (-1 indicates a filled circle)
-    for x,y in zip(xs,ys):
-        vis_img=cv2.circle(img.copy(), (x, y), radius, point_color, thickness)
-    # Save the modified image
-    cv2.imwrite("images/test_click.png", vis_img)
     # Process the image, x, y, and selected_class to get the segmentation mask
     mask = process_image_batch(img, xs, ys, labels)
     mask=mask.squeeze(0)
@@ -125,20 +118,13 @@ def get_annotation():
     return jsonify(mask_data)
 
 def process_image_continuous(image, x, y, selected_class):
-    # Your image processing and segmentation logic here
-    height, width, channels = image.shape
-    # For demonstration purposes, we create a dummy mask of the same size as the image
-    #dummy_mask = np.zeros((height, width), dtype=np.uint8)
     mask=get_mask(image,[[x,y]],[1])
     # Return the mask (replace this with your actual mask)
     return mask
 
 def process_image_batch(image, xs, ys,labels):
-    # Your image processing and segmentation logic here
     height, width, channels = image.shape
-    # For demonstration purposes, we create a dummy mask of the same size as the image
-    #dummy_mask = np.zeros((height, width), dtype=np.uint8)
-    mask=get_mask(image,[xs,ys],labels)
+    mask=get_mask(image,list(zip(xs,ys)),labels)
     # Return the mask (replace this with your actual mask)
     return mask
 
