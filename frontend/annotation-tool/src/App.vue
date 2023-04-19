@@ -20,7 +20,6 @@
         </div>
         <label for="files">Choose Files:</label>
         <input type="file" id="files" multiple @change="loadImages" />
-        <button type="submit">Submit</button>
         <div class="form-group">
           <label for="output-path">Output Path:</label>
           <input type="text" v-model="outputPath" id="output-path" />
@@ -346,6 +345,7 @@ export default {
     height: 100vh;
     width: 100vw;
     font-family: Arial, sans-serif;
+    font-weight: bold; 
   }
   .sidebar {
     width: 20%;
@@ -455,7 +455,7 @@ export default {
   }
   .selected-image img {
     max-width: 100%;
-    max-height: calc(100vh - 4rem);
+    max-height: 100%;
     object-fit: contain;
   }
   .selected-image button {
@@ -477,6 +477,9 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 1rem;
+  top: -20px;
+  mix-blend-mode: lighten;
+  
   }
   .logo img {
   max-width: 80%;

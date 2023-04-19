@@ -57,7 +57,7 @@ def vis_point(img,x,y):
     # Save the modified image
     cv2.imwrite("images/test.png", vis_img)
     
-def vis_point(img,xs,ys):
+def vis_points(img,xs,ys):
     # Save the image in a different format (e.g., PNG)
     point_color = (0, 0, 255)  # Red color in BGR
     # Draw the point
@@ -102,6 +102,7 @@ def get_segmentation():
     logging.info(f"Received parameters: x={x}, y={y}, class={selected_class}")         
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     # Process the image, x, y, and selected_class to get the segmentation mask
+    vis_point(img,x,y)
     mask = process_image_continuous(img, x, y, selected_class)
     mask=mask.squeeze(0)
     if not mask.any():
