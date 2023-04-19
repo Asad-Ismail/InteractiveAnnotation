@@ -184,7 +184,7 @@ export default {
       });
       console.log(`Saving Annotations sent: click data=${this.clicksData}`);
       const segmentationData = response.data;
-      this.drawMask(segmentationData, true);
+      this.drawMask(segmentationData, false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
@@ -332,7 +332,7 @@ export default {
       const segmentationData = response.data;
       // Add this line for debugging
       //console.log("Received mask data:", segmentationData);
-      this.drawMask(segmentationData,false);
+      this.drawMask(segmentationData,true);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
