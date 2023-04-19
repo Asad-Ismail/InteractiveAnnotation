@@ -23,6 +23,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Start with No image
 image=None
+filename=None
 annotations=[]
 annotation_id = 0 
 
@@ -73,8 +74,12 @@ def load_image():
     global image
     global annotations
     global annotation_id
+    global filename
+    
     logging.info(f"Loading Image")
     image_data = data["image"].split(",")[1]
+    filename = data["filename"]
+    logging.info(f"Passed Filename is {filename}")
     image = base64.b64decode(image_data)
     image = Image.open(io.BytesIO(image))
     # reset annotations

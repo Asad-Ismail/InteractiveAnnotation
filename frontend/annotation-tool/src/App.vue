@@ -73,6 +73,7 @@ export default {
       clicksData: [],
       previousMaskData: [],
       outputPath: ".",
+      imageNames: [],
     };
   },
   mounted() {
@@ -95,6 +96,7 @@ export default {
   try {
     await axios.post("http://localhost:5000/api/load_image", {
       image: this.imageUrls[this.currentIndex],
+      filename: this.imageNames[this.currentIndex],
     });
   } catch (error) {
     console.error("Error sending image to backend:", error);
@@ -130,6 +132,7 @@ export default {
           const reader = new FileReader();
           reader.onload = (e) => {
             this.imageUrls.push(e.target.result);
+            this.imageNames.push(file.name);
             this.sendImageToBackend(); // Add this line to send the image to the backend
           };
           reader.readAsDataURL(file);
