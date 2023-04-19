@@ -21,6 +21,10 @@
         <label for="files">Choose Files:</label>
         <input type="file" id="files" multiple @change="loadImages" />
         <button type="submit">Submit</button>
+        <div class="form-group">
+          <label for="output-path">Output Path:</label>
+          <input type="text" v-model="outputPath" id="output-path" />
+        </div>
       </form>
       <div class="action-buttons">
         <button @click="enablePreview" :class="{ active: isPreviewEnabled }">Preview</button>
@@ -67,6 +71,8 @@ export default {
       debounceTimeout: null,
       isPreviewEnabled: true,
       clicksData: [],
+      previousMaskData: [],
+      outputPath: ".",
     };
   },
   mounted() {
@@ -131,6 +137,7 @@ export default {
       }
     },
     clearCanvas() {
+    console.log("Clearing Canvas !!!!!");
     const canvas = this.$refs.canvas;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -142,42 +149,45 @@ export default {
       this.previousImage();
     }
     },
-    async onKeydown(event) {
-    if (event.ctrlKey && event.key === "s") {
-      event.preventDefault();
-      console.log("Saving Annotation and clearing clicks data:");
-      try {
+  async onKeydown(event) {
+  if (event.ctrlKey && event.key === "s") {
+    event.preventDefault();
+    console.log("Saving Annotation and clearing clicks data:");
+    console.log(`Preview Enabled: click data=${this.isPreviewEnabled}`);
+    this.isPreviewEnabled
+    try {
       const response = await axios.post("http://localhost:5000/api/annotation", {
         annotations: this.clicksData,
+        output_path: this.outputPath,
         save_res: true,
       });
       console.log(`Saving Annotations sent: click data=${this.clicksData}`);
       const segmentationData = response.data;
-      this.drawMask(segmentationData,false);
+      this.drawMask(segmentationData, false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
-      // click annotations
-      this.clicksData = [];
-    }
-    else if (event.key === " ") {
-      // Handle space key press event
-      console.log("Done with current object segmentation");
-      event.preventDefault();
-      console.log("Saving Annotation and clearing clicks data:");
-      try {
+    // click annotations
+    this.clicksData = [];
+    } else if (event.key === " ") {
+    // Handle space key press event
+    console.log("Done with current object segmentation");
+    event.preventDefault();
+    console.log("Saving Annotation and clearing clicks data:");
+    console.log(`Preview Enabled: click data=${this.isPreviewEnabled}`);
+    try {
       const response = await axios.post("http://localhost:5000/api/annotation", {
         annotations: this.clicksData,
         done_obj: true,
       });
       console.log(`Done current Annotation sent: click data=${this.clicksData}`);
       const segmentationData = response.data;
-      this.drawMask(segmentationData,false);
+      this.drawMask(segmentationData, false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
-      // click annotations
-      this.clicksData = [];
+    // click annotations
+    this.clicksData = [];
     }
     },
     clearAll() {
@@ -185,13 +195,15 @@ export default {
     // Clear canvas if needed
     },
     // method to draw the mask data on the canvas
-    drawMask(maskData,clearCanvas = true)
+    drawMask(maskData,clearCanvas = false)
     {
     if (!maskData || maskData.length === 0) {
       console.error("Mask data is empty or undefined");
       return;
     }
-    //console.log('maskData:', maskData); // Add this line to log the mask data
+    //console.log('maskData:', maskData); // Add this line to log the mask data 
+    // Merge previous data with current
+
     const image = this.$refs.image;
     const rect = image.getBoundingClientRect();
     const scaleX = image.naturalWidth / rect.width;
@@ -205,7 +217,7 @@ export default {
     const height = canvas.height;
     const selectedClassColor = 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
     if (clearCanvas) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      this.clearCanvas();
     }
     // Add variables to count the number of mask pixels drawn
     let drawnPixels = 0;
@@ -254,7 +266,7 @@ export default {
         });
 
         const segmentationData = response.data;
-        this.drawMask(segmentationData);
+        this.drawMask(segmentationData,true);
       } catch (error) {
         console.error("Error fetching segmentation data:", error);
       }
@@ -490,8 +502,8 @@ export default {
 .action-buttons button:hover {
   background-color: #fa983a;
 }
-
 .action-buttons button.active {
   background-color: #fa983a;
 }
+
 </style>

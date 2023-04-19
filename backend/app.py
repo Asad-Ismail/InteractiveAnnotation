@@ -118,9 +118,12 @@ def get_annotation():
     img=image.copy()
     inputs = request.get_json()
     anns=inputs["annotations"]
+    output_path=None
     if "save_res" in inputs:
         save_res=True
         logging.info(f"Saving initiated!!")
+        # if save_res is passed must also have output_path
+        output_path=inputs["output_path"]
     else:
         save_res=False
     if "done_obj" in inputs:
@@ -128,7 +131,8 @@ def get_annotation():
         logging.info(f"Done Object!!")
     else:
         done_obj=False
-           
+
+    logging.info(f"Output path is {output_path}")
     xs=[]
     ys=[]
     s_classes=[]
