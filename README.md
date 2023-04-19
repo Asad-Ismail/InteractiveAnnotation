@@ -1,18 +1,26 @@
-# Interactive Annotation 🖌️✨
+# Interactive Annotation Using Segment Anything 🖌️✨
 
-!!! This project is under active development
+
+![Interactive Annotation](vis_imgs/annotation.gif)
+![interactive Preview](vis_imgs/preview.gif)
+
 
 🎉 Welcome to the Interactive Annotation repository!
 
-🌟 This project is all about making instance segmentation more accessible and enjoyable for everyone. Whether you're a seasoned expert or a newbie in the world of image segmentation, you'll find this tool super handy and fun to use. Let's create an amazing annotation experience together! 🚀
+🌟 This project is all about making instance segmentation more accessible and enjoyable for everyone. Let's create an amazing annotation experience together! 🚀
 
 # 🌠 Features
 
-🎯 Easy-to-use interface for segmenting images using Segment Anything.
+Easy-to-use interface for segmenting images using Segment Anything.
 
-💾 Export annotations in various formats (JSON).
+Export annotations in Json formats.
 
-🔄 Undo and redo functionality for a hassle-free editing experience.
+Add custom class names for annotations.
+
+Navigate through images using arrow buttons or arrow keys on the keyboard.
+
+Preview mode or annotation mode.
+
 
 🛠️ Installation
 
@@ -31,7 +39,7 @@ Export annotations in your desired format.
 
 # 🤝 How to Contribute
 
-We absolutely 💖 contributions from our amazing community! To contribute, follow these steps:
+I would absolutely 💖 contributions from community! To contribute, follow these steps:
 
 Fork the repository 🍴.
 
