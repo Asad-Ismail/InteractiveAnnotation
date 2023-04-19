@@ -102,6 +102,12 @@ export default {
     console.error("Error sending image to backend:", error);
   }
   },
+  setCanvasDimensions() {
+  const image = this.$refs.image;
+  const canvas = this.$refs.canvas;
+  canvas.width = image.width;
+  canvas.height = image.height;
+  },
   previousImage() {
     if (this.currentIndex > 0) {
       this.clearCanvas(); // Add this line to clear the canvas
@@ -133,6 +139,9 @@ export default {
           reader.onload = (e) => {
             this.imageUrls.push(e.target.result);
             this.imageNames.push(file.name);
+            this.$refs.image.onload = () => { // Add this line to set the canvas dimensions when the image is loaded
+            this.setCanvasDimensions();
+            };
             this.sendImageToBackend(); // Add this line to send the image to the backend
           };
           reader.readAsDataURL(file);
@@ -206,19 +215,20 @@ export default {
     }
     //console.log('maskData:', maskData); // Add this line to log the mask data 
     // Merge previous data with current
-
     const image = this.$refs.image;
     const rect = image.getBoundingClientRect();
     const scaleX = image.naturalWidth / rect.width;
     const scaleY = image.naturalHeight / rect.height;
 
     const canvas = this.$refs.canvas;
-    canvas.width = image.width;
-    canvas.height = image.height;
+    // Remove these since it causes the reset of canvas
+    //canvas.width = image.width;
+    //canvas.height = image.height;
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
     const height = canvas.height;
     const selectedClassColor = 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
+
     if (clearCanvas) {
       this.clearCanvas();
     }
