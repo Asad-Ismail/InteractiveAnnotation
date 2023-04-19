@@ -13,6 +13,7 @@ import logging
 import cv2
 import pycocotools.mask as mask_util
 import json
+# Model is initialized here
 from run_torch_inference import *
 
 logging.basicConfig(level=logging.INFO)

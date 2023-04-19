@@ -184,7 +184,7 @@ export default {
       });
       console.log(`Saving Annotations sent: click data=${this.clicksData}`);
       const segmentationData = response.data;
-      this.drawMask(segmentationData, false);
+      this.drawMask(segmentationData, true);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
