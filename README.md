@@ -1,13 +1,16 @@
 # Interactive Annotation Using Segment Anything 🖌️✨
 
 
-![Interactive Annotation](vis_imgs/annotation.gif)
-![interactive Preview](vis_imgs/preview.gif)
-
-
 🎉 Welcome to the Interactive Annotation repository!
 
 🌟 This project is all about making instance segmentation more accessible and enjoyable for everyone. Let's create an amazing annotation experience together! 🚀
+
+
+### 📽️ Interactive Annotation "Annotation Mode" in Action
+![Interactive Annotation](vis_imgs/annotation.gif)
+
+### 📽️ Interactive "Preview Mode" Mode
+![Interactive Preview](vis_imgs/preview.gif)
 
 # 🌠 Features
 
