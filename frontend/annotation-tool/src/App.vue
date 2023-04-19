@@ -1,8 +1,11 @@
 <template>
   <div id="app">
     <div class="sidebar">
+      <div class="custom-text">
+        PixelVisionX
+      </div>
       <div class="logo">
-        <img :src="require('@/assets/logo.jpeg')" alt="Your Logo">
+        <img :src="require('@/assets/logo.jpeg')" alt="My logo">
       </div>
       <h2>Create New Class</h2>
       <form @submit.prevent="addClass">
@@ -57,8 +60,8 @@
 </template>
 
 <script>
-import axios from "axios";
 
+import axios from "axios";
 export default {
   data() {
     return {
@@ -347,21 +350,26 @@ export default {
     font-family: Arial, sans-serif;
     font-weight: bold; 
   }
-  .sidebar {
+  .sidebar 
+  {
     width: 20%;
     min-height: 100vh;
     background-color: #4a69bd;
     padding: 1rem;
     overflow-y: auto;
-    color: #fff;
+    /*color: #fff;*/
+    color: rgba(238, 255, 0, 0.795);
   }
-  .sidebar h2 {
+  .sidebar h2 
+  {
     margin-top: 0;
   }
-  .sidebar hr {
+  .sidebar hr 
+  {
     border-color: #fff;
   }
-  .sidebar label {
+  .sidebar label 
+  {
     font-size: 1.2rem;
     margin-bottom: 1rem;
   }
@@ -403,14 +411,15 @@ export default {
     margin-bottom: 3rem;
     transition: background-color 0.3s;
   }
-  .sidebar button:hover {
+  .sidebar button:hover 
+  {
     background-color: #fa983a;
   }
-  .sidebar .form-group {
+  .sidebar .form-group
+  {
     display: flex;
     flex-direction: column;
   }
-
   .main {
   width: 65%;
   min-height: 100vh;
@@ -428,8 +437,9 @@ export default {
   justify-content: center;
   overflow: auto;
   position: relative; /* Add this line */
-}
-  input[type="file"] {
+  }
+  input[type="file"] 
+  {
     margin-bottom: 1rem;
   }
   img {
@@ -471,7 +481,6 @@ export default {
   .selected-image button:focus {
     outline: none;
   }
-
   .logo {
   display: flex;
   justify-content: center;
@@ -481,13 +490,14 @@ export default {
   mix-blend-mode: lighten;
   
   }
-  .logo img {
+  .logo img 
+  {
   max-width: 80%;
   max-height: 80px;
   }
-
 .selected-image img,
-.selected-image canvas {
+.selected-image canvas 
+{
   position: absolute;
   top: 0;
   left: 0;
@@ -496,14 +506,14 @@ export default {
   object-fit: contain;
   z-index: 1;
 }
-
-.action-buttons {
+.action-buttons
+{
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
-
-.action-buttons button {
+.action-buttons button 
+{
   background-color: #f6b93b;
   border: none;
   color: #fff;
@@ -514,12 +524,20 @@ export default {
   font-weight: bold;
   transition: background-color 0.3s;
 }
-
-.action-buttons button:hover {
+.action-buttons button:hover 
+{
   background-color: #fa983a;
 }
-.action-buttons button.active {
+.action-buttons button.active 
+{
   background-color: #fa983a;
 }
-
+.sidebar .custom-text 
+{
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: rgba(0, 255, 98, 0.795);
+}
 </style>
