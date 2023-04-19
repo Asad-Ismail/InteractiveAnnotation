@@ -76,6 +76,7 @@ export default {
       previousMaskData: [],
       outputPath: ".",
       imageNames: [],
+      classColorMap: {},
     };
   },
   mounted() {
@@ -103,6 +104,12 @@ export default {
   } catch (error) {
     console.error("Error sending image to backend:", error);
   }
+  },
+  generateRandomColor(opacity = 0.5) {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   },
   setCanvasDimensions() {
   const image = this.$refs.image;
@@ -229,7 +236,7 @@ export default {
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
     const height = canvas.height;
-    const selectedClassColor = 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
+    const selectedClassColor = this.classColorMap[this.selectedClass] || 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
 
     if (clearCanvas) {
       this.clearCanvas();
@@ -333,6 +340,7 @@ export default {
   addClass() {
       if (this.newClassName.trim() !== "" && !this.classNames.includes(this.newClassName.trim())) {
         this.classNames.push(this.newClassName.trim());
+        this.classColorMap[this.newClassName.trim()] = this.generateRandomColor();
         this.newClassName = "";
       }
     },
