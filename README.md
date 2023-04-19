@@ -9,7 +9,7 @@
 ### 📽️ Interactive Annotation "Annotation Mode" in Action
 ![Interactive Annotation](vis_imgs/annotation.gif)
 
-### 📽️ Interactive "Preview Mode" Mode
+### 📽️ Interactive Annotation "Preview Mode" Mode
 ![Interactive Preview](vis_imgs/preview.gif)
 
 # 🌠 Features
@@ -29,6 +29,10 @@ Preview mode or annotation mode.
 
 Follow these simple steps to set up the Interactive Annotation tool:
 
+Install front dependencies using npm install
+
+Install backend dependencies using pip install -r requirments.txt
+
 # 📖 Usage
 
 Load an image by clicking the "Open Image" button.
@@ -42,17 +46,7 @@ Export annotations in your desired format.
 
 # 🤝 How to Contribute
 
-I would absolutely 💖 contributions from community! To contribute, follow these steps:
-
-Fork the repository 🍴.
-
-Create a new branch (git checkout -b feature/YourFeature).
-
-Commit your changes (git commit -m 'Add YourFeature').
-
-Push the branch (git push origin feature/YourFeature).
-
-Create a Pull Request 📬.
+I would absolutely 💖 contributions from community! 
 
 # 📃 License
 This project is licensed under the MIT License.
