@@ -3,7 +3,7 @@
 
 🎉 Welcome to the Interactive Annotation repository!
 
-🌟 This project is all about making instance segmentation more accessible and enjoyable for everyone. Let's create an amazing annotation experience together! 🚀
+🌟 This project is all about making segmentation more accessible, faster, accurate and enjoyable for everyone using recently released segement anything model. Let's create an amazing annotation experience together! 🚀
 
 
 ### 📽️ Interactive Annotation "Annotation Mode" in Action
