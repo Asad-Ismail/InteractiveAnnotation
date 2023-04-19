@@ -55,3 +55,13 @@ This project is licensed under the MIT License.
 If you find this project helpful or interesting, please give it a ⭐️ to help it reach more people! And if you have any feedback, ideas, or want to contribute, feel free to open an issue or a pull request. We're always excited to hear from you! 🤗
 
 Happy annotating! 🎉
+
+## References
+```
+@article{kirillov2023segany,
+  title={Segment Anything},
+  author={Kirillov, Alexander and Mintun, Eric and Ravi, Nikhila and Mao, Hanzi and Rolland, Chloe and Gustafson, Laura and Xiao, Tete and Whitehead, Spencer and Berg, Alexander C. and Lo, Wan-Yen and Doll{\'a}r, Piotr and Girshick, Ross},
+  journal={arXiv:2304.02643},
+  year={2023}
+}
+```
