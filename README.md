@@ -38,7 +38,15 @@ Preview mode or annotation mode.
 
 Follow these simple steps to set up the Interactive Annotation tool:
 
-Install front dependencies using npm install
+```
+chmod +x backend/run_app.sh
+chmod +x run_project.sh
+```
+
+```
+./run_project.sh
+```
+
 
 Install backend dependencies using pip install -r requirments.txt
 
