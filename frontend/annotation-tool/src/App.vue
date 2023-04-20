@@ -222,11 +222,11 @@ export default {
     this.clearCanvas();
     },
     // method to draw the mask data on the canvas
-    drawMask(maskData,clearCanvas = false)
+    drawMask(segmentationData ,clearCanvas = false)
     {
-    if (!maskData || maskData.length === 0) {
-      console.error("Mask data is empty or undefined");
-      return;
+    if (!segmentationData || Object.keys(segmentationData.saved_masks).length === 0) {
+    console.error("Segmentation data is empty or undefined");
+    return;
     }
     //console.log('maskData:', maskData); // Add this line to log the mask data 
     // Merge previous data with current
@@ -236,13 +236,10 @@ export default {
     const scaleY = image.naturalHeight / rect.height;
 
     const canvas = this.$refs.canvas;
-    // Remove these since it causes the reset of canvas
-    //canvas.width = image.width;
-    //canvas.height = image.height;
     const ctx = canvas.getContext("2d");
     const width = canvas.width;
     const height = canvas.height;
-    const selectedClassColor = this.classColorMap[this.selectedClass] || 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
+    //const selectedClassColor = this.classColorMap[this.selectedClass] || 'rgba(255, 0, 0, 0.5)'; // Set the color for the selected class
 
     if (clearCanvas) {
       this.clearCanvas();
