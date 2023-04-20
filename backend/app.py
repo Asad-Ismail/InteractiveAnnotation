@@ -13,6 +13,7 @@ import logging
 import cv2
 import pycocotools.mask as mask_util
 import json
+import os
 # Model is initialized here
 from run_torch_inference import *
 
@@ -77,6 +78,7 @@ def load_image():
     global annotations
     global annotation_id
     global filename
+    global saved_masks
     
     logging.info(f"Loading Image")
     image_data = data["image"].split(",")[1]
@@ -87,6 +89,7 @@ def load_image():
     # reset annotations
     annotations = []
     annotation_id = 0  # Changed from annotaiton_id
+    saved_masks={}
     return jsonify({"success": True})
 
 @app.route('/api/segmentation', methods=['POST'])
@@ -115,6 +118,22 @@ def get_segmentation():
     mask_data = mask.tolist()
     return jsonify(mask_data)
 
+
+@app.route('/api/annotation', methods=['POST'])
+def save_annotation():
+    global annotations
+    global filename
+    inputs = request.get_json()
+    logging.info(f"Saving initiated!!")
+    # if save_res is passed must also have output_path
+    output_path=inputs["output_path"]
+    logging.warn(f"Annotations are {annotations}")
+    json_file="".join(filename.split(".")[:-1])
+    pth=os.path.join(output_path,json_file)
+    logging.info(f"Output path is {pth}")
+    with open("annotations.json", "w") as f:
+        json.dump(annotations, f)
+
 @app.route('/api/annotation', methods=['POST'])
 def get_annotation():
     #logging.info(f"Received segmentation request")
@@ -129,20 +148,11 @@ def get_annotation():
     inputs = request.get_json()
     anns=inputs["annotations"]
     output_path=None
-    if "save_res" in inputs:
-        save_res=True
-        logging.info(f"Saving initiated!!")
-        # if save_res is passed must also have output_path
-        output_path=inputs["output_path"]
-    else:
-        save_res=False
     if "done_obj" in inputs:
         done_obj=True
         logging.info(f"Done Object!!")
     else:
         done_obj=False
-
-    logging.info(f"Output path is {output_path}")
     xs=[]
     ys=[]
     s_classes=[]
@@ -188,15 +198,10 @@ def get_annotation():
         annotations.append(annotation)
         annotation_id += 1
     
-    if save_res:
-        logging.warn(f"Annotations are {annotations}")
-        with open("annotations.json", "w") as f:
-            json.dump(annotations, f)
-    
     combined_mask = np.zeros_like(mask)
     for current_class, current_mask in saved_masks.items():
         combined_mask = np.logical_or(combined_mask, current_mask)
-    
+
     # Convert the saved_masks to a JSON object
     saved_masks_data = {key: mask.tolist() for key, mask in saved_masks.items()}
     response_data = {
@@ -204,9 +209,6 @@ def get_annotation():
         "saved_masks": saved_masks_data
     }
     return jsonify(response_data)
-    # Convert the mask to a JSON object and return it
-    #mask_data = mask.tolist()
-    #return jsonify(mask_data)
 
 def process_image_continuous(image, x, y, selected_class):
     mask=get_mask(image,[[x,y]],[1])
