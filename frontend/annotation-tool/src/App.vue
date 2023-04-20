@@ -180,14 +180,15 @@ export default {
     console.log(`Preview Enabled: click data=${this.isPreviewEnabled}`);
     this.isPreviewEnabled
     try {
-      const response = await axios.post("http://localhost:5000/api/annotation", {
+       await axios.post("http://localhost:5000/api/annotation", {
         annotations: this.clicksData,
         output_path: this.outputPath,
         save_res: true,
       });
       console.log(`Saving Annotations sent: click data=${this.clicksData}`);
-      const segmentationData = response.data;
-      this.drawMask(segmentationData, false);
+      //Dont draw again saved annotaiton
+      //const segmentationData = response.data;
+      //this.drawMask(segmentationData, false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
@@ -200,13 +201,14 @@ export default {
     console.log("Saving Annotation and clearing clicks data:");
     console.log(`Preview Enabled: click data=${this.isPreviewEnabled}`);
     try {
-      const response = await axios.post("http://localhost:5000/api/annotation", {
+       await axios.post("http://localhost:5000/api/annotation", {
         annotations: this.clicksData,
         done_obj: true,
       });
       console.log(`Done current Annotation sent: click data=${this.clicksData}`);
-      const segmentationData = response.data;
-      this.drawMask(segmentationData, false);
+      // Dont draw the annotation mask again
+      //const segmentationData = response.data;
+      //this.drawMask(segmentationData, false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }

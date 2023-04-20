@@ -58,3 +58,4 @@ def get_mask(image,point,label):
     }
     masks, probs, low_res_logits = ort_session.run(None, ort_inputs)
     masks = masks > predictor.model.mask_threshold
+    return masks
