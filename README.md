@@ -7,10 +7,14 @@
 
 
 ### 📽️ Interactive Annotation "Annotation Mode" in Action
-![Interactive Annotation](vis_imgs/annotation.gif)
+<p align="center">
+  <img src="vis_imgs/annotation.gif" alt="Interactive Annotation">
+</p>
 
 ### 📽️ Interactive Annotation "Preview Mode" Mode
-![Interactive Preview](vis_imgs/preview.gif)
+<p align="center">
+  <img src="vis_imgs/preview.gif" alt="Interactive Annotation">
+</p>
 
 # 🌠 Features
 
