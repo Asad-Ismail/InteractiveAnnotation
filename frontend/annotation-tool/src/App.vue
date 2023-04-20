@@ -180,15 +180,11 @@ export default {
     console.log(`Preview Enabled: click data=${this.isPreviewEnabled}`);
     this.isPreviewEnabled
     try {
-       await axios.post("http://localhost:5000/api/annotation", {
+        const response=await axios.post("http://localhost:5000/api/annotation", {
         annotations: this.clicksData,
         output_path: this.outputPath,
         save_res: true,
       });
-      console.log(`Saving Annotations sent: click data=${this.clicksData}`);
-      //Dont draw again saved annotaiton
-      //const segmentationData = response.data;
-      //this.drawMask(segmentationData, false);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
@@ -201,14 +197,14 @@ export default {
     console.log("Saving Annotation and clearing clicks data:");
     console.log(`Preview Enabled: click data=${this.isPreviewEnabled}`);
     try {
-       await axios.post("http://localhost:5000/api/annotation", {
+      const response=await axios.post("http://localhost:5000/api/annotation", {
         annotations: this.clicksData,
         done_obj: true,
       });
       console.log(`Done current Annotation sent: click data=${this.clicksData}`);
       // Dont draw the annotation mask again
-      //const segmentationData = response.data;
-      //this.drawMask(segmentationData, false);
+      const segmentationData = response.data;
+      this.drawMask(segmentationData, true);
     } catch (error) {
       console.error("Error sending annotation data:", error);
     }
@@ -224,11 +220,13 @@ export default {
     // method to draw the mask data on the canvas
     drawMask(segmentationData ,clearCanvas = false)
     {
-    if (!segmentationData || Object.keys(segmentationData.saved_masks).length === 0) {
+
+    console.log('maskData:', segmentationData)
+    if (!segmentationData || !segmentationData.saved_masks || Object.keys(segmentationData.saved_masks).length === 0) {
     console.error("Segmentation data is empty or undefined");
     return;
     }
-    //console.log('maskData:', maskData); // Add this line to log the mask data 
+    console.log('maskData:', segmentationData); // Add this line to log the mask data 
     // Merge previous data with current
     const image = this.$refs.image;
     const rect = image.getBoundingClientRect();
@@ -340,7 +338,8 @@ export default {
       // Add this line for debugging
       //console.log("Received mask data:", segmentationData);
       this.drawMask(segmentationData,true);
-    } catch (error) {
+    } catch (error) 
+    {
       console.error("Error sending annotation data:", error);
     }
   },
