@@ -217,6 +217,7 @@ export default {
     clearAll() {
     this.clicksData= [];
     // Clear canvas if needed
+    this.clearCanvas();
     },
     // method to draw the mask data on the canvas
     drawMask(maskData,clearCanvas = false)
