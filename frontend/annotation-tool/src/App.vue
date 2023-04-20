@@ -250,22 +250,26 @@ export default {
     // Add variables to count the number of mask pixels drawn
     let drawnPixels = 0;
     let totalPixels = 0;
-    for (let i = 0; i < height; i++) {
-      for (let j = 0; j < width; j++) {
-        // Get the corresponding mask data based on scaleX and scaleY
-        const maskX = Math.round(j * scaleX);
-        const maskY = Math.round(i * scaleY);
-        const maskValue = maskData[maskY][maskX];
-        if (maskValue) {
-          ctx.fillStyle = selectedClassColor; // Use the selected class color for the boolean mask
-          ctx.fillRect(j, i, 1, 1);
-          drawnPixels++; // Increment drawnPixels
+
+    for (const classKey in segmentationData.saved_masks) {
+      const maskData = segmentationData.saved_masks[classKey];
+      const classColor = this.classColorMap[classKey] || 'rgba(255, 0, 0, 0.5)';
+
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          const maskX = Math.round(j * scaleX);
+          const maskY = Math.round(i * scaleY);
+          const maskValue = maskData[maskY][maskX];
+          if (maskValue) {
+            ctx.fillStyle = classColor;
+            ctx.fillRect(j, i, 1, 1);
+            drawnPixels++;
+          }
+          totalPixels++;
         }
-        totalPixels++; // Increment totalPixels
       }
     }
-    console.log('Mask drawn on canvas.'); // Log message for mask drawing
-    // Log the number of drawn mask pixels
+    console.log('Masks drawn on canvas.');
     console.log(`Drawn pixels: ${drawnPixels} / ${totalPixels}`);
   },
 

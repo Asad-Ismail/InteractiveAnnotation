@@ -165,15 +165,15 @@ def get_annotation():
         print("Warning: mask is empty")
     else:
         print("Returning a non-empty mask")
-        
+    
+    # Save the current mask with the class
+    current_class = s_classes[-1]
+    if current_class not in saved_masks:
+        saved_masks[current_class] = mask
+    else:
+        saved_masks[current_class] = np.logical_or(saved_masks[current_class], mask)
+    
     if done_obj:
-        # Save the current mask with the class
-        current_class = s_classes[-1]
-        if current_class not in saved_masks:
-            saved_masks[current_class] = mask
-        else:
-            saved_masks[current_class] = np.logical_or(saved_masks[current_class], mask)
-
         # Create an annotation in COCO format
         bbox = compute_bbox(mask)
         annotation = {
@@ -186,7 +186,7 @@ def get_annotation():
             "iscrowd": 0
         }
         annotations.append(annotation)
-        annotation_id += 1    
+        annotation_id += 1
     
     if save_res:
         logging.warn(f"Annotations are {annotations}")
@@ -197,9 +197,16 @@ def get_annotation():
     for current_class, current_mask in saved_masks.items():
         combined_mask = np.logical_or(combined_mask, current_mask)
     
+    # Convert the saved_masks to a JSON object
+    saved_masks_data = {key: mask.tolist() for key, mask in saved_masks.items()}
+    response_data = {
+        "combined_mask": combined_mask.tolist(),
+        "saved_masks": saved_masks_data
+    }
+    return jsonify(response_data)
     # Convert the mask to a JSON object and return it
-    mask_data = mask.tolist()
-    return jsonify(mask_data)
+    #mask_data = mask.tolist()
+    #return jsonify(mask_data)
 
 def process_image_continuous(image, x, y, selected_class):
     mask=get_mask(image,[[x,y]],[1])
