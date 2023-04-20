@@ -49,8 +49,8 @@
         <div class="image-navigation">
           <button @click="previousImage">&#8249;</button>
           <div class="image-container">
-            <img ref="image" :src="imageUrls[currentIndex]" @mousemove="onMouseMove" @mousedown="onMouseDown" @contextmenu.prevent style="z-index: 1;" />
-            <canvas ref="canvas" width="0" height="0" @mousemove="onMouseMove" @mousedown="onMouseDown" @contextmenu.prevent style="z-index: 2;"></canvas>
+            <img ref="image" :src="imageUrls[currentIndex]" @contextmenu.prevent style="z-index: 1;" />
+            <canvas ref="canvas" width="0" height="0" @mousemove="onMouseMove" @mousedown="onMouseDown" @contextmenu.prevent @mouseleave="clearDebounceTimeout" style="z-index: 2;"></canvas>
           </div>
           <button @click="nextImage">&#8250;</button>
         </div>
@@ -94,6 +94,9 @@ export default {
   setCurrentIndex(index) {
     this.currentIndex = index;
     this.sendImageToBackend(); // Add this line to send the image to the backend
+  },
+  clearDebounceTimeout() {
+    clearTimeout(this.debounceTimeout);
   },
   async sendImageToBackend() {
   try {
