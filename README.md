@@ -1,7 +1,7 @@
 # Interactive Annotation Using Segment Anything 🖌️✨
 
 
-🎉 Welcome to the Interactive Annotation repository!
+🎉 Welcome to open source Interactive Annotation repository using segment anything a state of the art segmentation model trained on 11M images, 1B+ masks !
 
 🌟 This project is all about making segmentation more accessible, faster, accurate and enjoyable for everyone using recently released segement anything model. Let's create an amazing annotation experience together! 🚀
 
@@ -73,7 +73,7 @@ Install backend dependencies using pip install -r requirments.txt
 
 ## To-Do List
 
-1. Replace pytorch model with onnx model to speed up annotation
+1. Replace pytorch model with onnx model to speed up annotation (It is actually preferred way to do annotation will be done very soon!)
 2. Add bounding box as an input 
 3. Add zoom in and zoom out
 
