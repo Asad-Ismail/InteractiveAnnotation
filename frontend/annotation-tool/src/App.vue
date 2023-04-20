@@ -180,8 +180,7 @@ export default {
     console.log(`Preview Enabled: click data=${this.isPreviewEnabled}`);
     this.isPreviewEnabled
     try {
-        const response=await axios.post("http://localhost:5000/api/annotation", {
-        annotations: this.clicksData,
+        await axios.post("http://localhost:5000/api/save_annotation", {
         output_path: this.outputPath,
         save_res: true,
       });

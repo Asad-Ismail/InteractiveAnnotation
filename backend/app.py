@@ -94,7 +94,10 @@ def load_image():
 
 @app.route('/api/segmentation', methods=['POST'])
 def get_segmentation():
-    logging.info(f"Received segmentation request kkk")
+    logging.info(f"Received Preview segmentation request")
+    global saved_masks
+    # Resetting saved_mask for preview mode
+    saved_masks = {} 
     if image is None:
         logging.info(f"Image is None")
         return jsonify({"Success": False, "Message": "No image loaded"})
@@ -110,16 +113,33 @@ def get_segmentation():
     vis_point(img,x,y)
     mask = process_image_continuous(img, x, y, selected_class)
     mask=mask.squeeze(0)
+    
     if not mask.any():
         print("Warning: mask is empty")
     else:
-        print("Returning a non-empty mask")
-    # Convert the mask to a JSON object and return it
-    mask_data = mask.tolist()
-    return jsonify(mask_data)
+        print("Returning a non-empty mask") 
+    # Save the current mask with the class
+    current_class = "Stuff"
+    if current_class not in saved_masks:
+        saved_masks[current_class] = mask
+    else:
+        saved_masks[current_class] = np.logical_or(saved_masks[current_class], mask)
+    
+    combined_mask = np.zeros_like(mask)
+    for current_class, current_mask in saved_masks.items():
+        combined_mask = np.logical_or(combined_mask, current_mask)
+    
+    # Convert the saved_masks to a JSON object
+    saved_masks_data = {key: mask.tolist() for key, mask in saved_masks.items()}
+    response_data = {
+        "combined_mask": combined_mask.tolist(),
+        "saved_masks": saved_masks_data
+    }
+    return jsonify(response_data)
+        
 
 
-@app.route('/api/annotation', methods=['POST'])
+@app.route('/api/save_annotation', methods=['POST'])
 def save_annotation():
     global annotations
     global filename
@@ -127,12 +147,13 @@ def save_annotation():
     logging.info(f"Saving initiated!!")
     # if save_res is passed must also have output_path
     output_path=inputs["output_path"]
-    logging.warn(f"Annotations are {annotations}")
+    #logging.warn(f"Annotations are {annotations}")
     json_file="".join(filename.split(".")[:-1])
-    pth=os.path.join(output_path,json_file)
+    pth=os.path.join(output_path,json_file+".json")
     logging.info(f"Output path is {pth}")
-    with open("annotations.json", "w") as f:
+    with open(pth, "w") as f:
         json.dump(annotations, f)
+    return jsonify({"message": "Annotation saved successfully"}), 200
 
 @app.route('/api/annotation', methods=['POST'])
 def get_annotation():
