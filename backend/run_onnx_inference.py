@@ -57,3 +57,4 @@ def get_mask(image,point,label):
     "orig_im_size": np.array(image.shape[:2], dtype=np.float32)
     }
     masks, probs, low_res_logits = ort_session.run(None, ort_inputs)
+    masks = masks > predictor.model.mask_threshold
