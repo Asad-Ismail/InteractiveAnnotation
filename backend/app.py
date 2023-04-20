@@ -95,7 +95,6 @@ def load_image():
 @app.route('/api/segmentation', methods=['POST'])
 def get_segmentation():
     logging.info(f"Received Preview segmentation request")
-    global saved_masks
     # Resetting saved_mask for preview mode
     saved_masks = {} 
     if image is None:
