@@ -27,6 +27,7 @@ image=None
 filename=None
 annotations=[]
 annotation_id = 0 
+saved_masks = {}  # Save masks per class
 
 def encode_mask_to_coco_rle(mask):
     rle = mask_util.encode(np.asfortranarray(mask.astype(np.uint8)))
@@ -119,6 +120,8 @@ def get_annotation():
     #logging.info(f"Received segmentation request")
     global annotation_id
     global annotations
+    global saved_masks
+    
     if image is None:
         logging.info(f"Image is None")
         return jsonify({"Success": False, "Message": "No image loaded"})
@@ -164,6 +167,13 @@ def get_annotation():
         print("Returning a non-empty mask")
         
     if done_obj:
+        # Save the current mask with the class
+        current_class = s_classes[-1]
+        if current_class not in saved_masks:
+            saved_masks[current_class] = mask
+        else:
+            saved_masks[current_class] = np.logical_or(saved_masks[current_class], mask)
+
         # Create an annotation in COCO format
         bbox = compute_bbox(mask)
         annotation = {
@@ -176,12 +186,17 @@ def get_annotation():
             "iscrowd": 0
         }
         annotations.append(annotation)
-        annotation_id += 1
+        annotation_id += 1    
+    
     if save_res:
         logging.warn(f"Annotations are {annotations}")
         with open("annotations.json", "w") as f:
             json.dump(annotations, f)
-            
+    
+    combined_mask = np.zeros_like(mask)
+    for current_class, current_mask in saved_masks.items():
+        combined_mask = np.logical_or(combined_mask, current_mask)
+    
     # Convert the mask to a JSON object and return it
     mask_data = mask.tolist()
     return jsonify(mask_data)
