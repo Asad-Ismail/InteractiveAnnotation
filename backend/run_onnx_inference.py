@@ -3,6 +3,7 @@ import onnxruntime
 from segment_anything import sam_model_registry, SamPredictor
 import matplotlib.pyplot as plt
 import numpy as np
+import cv2
 
 
 def show_mask(mask, ax):
@@ -38,6 +39,8 @@ image_embedding=None
 def set_image(image):
     global image_embedding
     print(f"Setting Image in model!")
+    image = cv2.cvtColor(np.array(image).astype(np.uint8), cv2.COLOR_RGB2BGR)
+    cv2.imwrite("kk.png",image)
     predictor.set_image(image)
     image_embedding = predictor.get_image_embedding().cpu().numpy()
 
@@ -60,5 +63,4 @@ def get_mask(image,point,label):
     masks = masks > predictor.model.mask_threshold
     max_prob=np.argmax(probs)
     mask=masks[max_prob]
-    print(f"Returned mask shape is {mask.shape}!!")
-    return masks
+    return mask

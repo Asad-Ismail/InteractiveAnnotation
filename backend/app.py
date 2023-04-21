@@ -84,10 +84,10 @@ def load_image():
     logging.info(f"Loading Image!!")
     image_data = data["image"].split(",")[1]
     filename = data["filename"]
-    set_image(image)
     #logging.info(f"Passed Filename is {filename}")
     image = base64.b64decode(image_data)
     image = Image.open(io.BytesIO(image))
+    set_image(image)
     # reset annotations
     annotations = []
     annotation_id = 0  # Changed from annotaiton_id
@@ -114,7 +114,7 @@ def get_segmentation():
     vis_point(img,x,y)
     mask = process_image_continuous(img, x, y, selected_class)
     mask=mask.squeeze(0)
-    
+    logging.info(f"Mask shape isssda {mask.shape}")
     if not mask.any():
         print("Warning: mask is empty")
     else:
@@ -190,6 +190,7 @@ def get_annotation():
     # Process the image, x, y, and selected_class to get the segmentation mask
     mask = process_image_batch(img, xs, ys, labels)
     mask=mask.squeeze(0)
+    logging.info(f"Mask shape isyxcy {mask.shape}")
     #print(f"Image shape is {img.shape}")
     #print(f"Mask shape is {mask.shape}")
     # Add these lines for debugging
