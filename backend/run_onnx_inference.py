@@ -35,6 +35,7 @@ sam.to(device='cuda')
 predictor = SamPredictor(sam)
 
 image_embedding=None
+low_res_masks=None
 
 def set_image(image):
     global image_embedding
@@ -46,11 +47,16 @@ def set_image(image):
 
 def get_mask(image,point,label):
     global image_embedding
+    global low_res_masks
     onnx_coord = np.concatenate([point, np.array([[0.0, 0.0]])], axis=0)[None, :, :]
     onnx_label = np.concatenate([label, np.array([-1])], axis=0)[None, :].astype(np.float32)
     onnx_coord = predictor.transform.apply_coords(onnx_coord, image.shape[:2]).astype(np.float32)
-    onnx_mask_input = np.zeros((1, 1, 256, 256), dtype=np.float32)
-    onnx_has_mask_input = np.zeros(1, dtype=np.float32)
+    if low_res_masks:
+        onnx_mask_input = low_res_masks
+        onnx_has_mask_input = np.ones(1, dtype=np.float32)
+    else:
+        onnx_mask_input = np.zeros((1, 1, 256, 256), dtype=np.float32)
+        onnx_has_mask_input = np.zeros(1, dtype=np.float32)
     ort_inputs = {
     "image_embeddings": image_embedding,
     "point_coords": onnx_coord,
