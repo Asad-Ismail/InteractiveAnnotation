@@ -1,2 +1,3 @@
 *.pth
 *.onnx
+*.pyc
