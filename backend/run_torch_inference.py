@@ -52,7 +52,6 @@ def get_mask(image,point,label):
     point_labels=input_label,
     multimask_output=False,)
     print(f"Finished Forward path!")
-    #show_mask(masks)
     return masks
 
 if __name__=="__main__":
