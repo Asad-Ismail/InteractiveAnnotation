@@ -38,9 +38,9 @@ image_embedding=None
 
 def set_image(image):
     global image_embedding
-    print(f"Setting Image in model!")
-    image = cv2.cvtColor(np.array(image).astype(np.uint8), cv2.COLOR_RGB2BGR)
-    cv2.imwrite("kk.png",image)
+    #print(f"Setting Image in model!")
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    #cv2.imwrite("kk.png",image)
     predictor.set_image(image)
     image_embedding = predictor.get_image_embedding().cpu().numpy()
 
