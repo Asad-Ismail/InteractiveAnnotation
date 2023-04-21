@@ -39,7 +39,9 @@ low_res_masks=None
 
 def set_image(image):
     global image_embedding
+    global low_res_masks
     print(f"Setting Image in model!")
+    # Reset low res masks
     low_res_masks=None
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     predictor.set_image(image)
