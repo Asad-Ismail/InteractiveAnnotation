@@ -15,8 +15,8 @@ import pycocotools.mask as mask_util
 import json
 import os
 # Model is initialized here
-from run_torch_inference import *
-#from run_onnx_inference import *
+#from run_torch_inference import *
+from run_onnx_inference import *
 
 logging.basicConfig(level=logging.INFO)
 
@@ -87,7 +87,7 @@ def load_image():
     #logging.info(f"Passed Filename is {filename}")
     image = base64.b64decode(image_data)
     image = Image.open(io.BytesIO(image))
-    #set_image(image)
+    set_image(image)
     # reset annotations
     annotations = []
     annotation_id = 0  # Changed from annotaiton_id
@@ -149,6 +149,7 @@ def save_annotation():
     json_file="".join(filename.split(".")[:-1])
     pth=os.path.join(output_path,json_file+".json")
     logging.info(f"Output path is {pth}")
+    reset_low_res()
     with open(pth, "w") as f:
         json.dump(annotations, f)
     return jsonify({"message": "Annotation saved successfully"}), 200
