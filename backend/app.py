@@ -137,8 +137,6 @@ def get_segmentation():
     }
     return jsonify(response_data)
         
-
-
 @app.route('/api/save_annotation', methods=['POST'])
 def save_annotation():
     global annotations
@@ -218,6 +216,7 @@ def get_annotation():
         }
         annotations.append(annotation)
         annotation_id += 1
+        reset_low_res()
     
     combined_mask = np.zeros_like(mask)
     for current_class, current_mask in saved_masks.items():

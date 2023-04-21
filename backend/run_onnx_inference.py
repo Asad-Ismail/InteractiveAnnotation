@@ -59,6 +59,7 @@ def get_mask(image,point,label):
     onnx_label = np.concatenate([label, np.array([-1])], axis=0)[None, :].astype(np.float32)
     onnx_coord = predictor.transform.apply_coords(onnx_coord, image.shape[:2]).astype(np.float32)
     if low_res_masks:
+        print(f"Using previous low res masks")
         onnx_mask_input = low_res_masks
         onnx_has_mask_input = np.ones(1, dtype=np.float32)
     else:
