@@ -15,7 +15,8 @@ import pycocotools.mask as mask_util
 import json
 import os
 # Model is initialized here
-from run_torch_inference import *
+#from run_torch_inference import *
+from run_onnx_inference import *
 
 logging.basicConfig(level=logging.INFO)
 
@@ -80,10 +81,11 @@ def load_image():
     global filename
     global saved_masks
     
-    logging.info(f"Loading Image")
+    logging.info(f"Loading Image!!")
     image_data = data["image"].split(",")[1]
     filename = data["filename"]
-    logging.info(f"Passed Filename is {filename}")
+    set_image(image)
+    #logging.info(f"Passed Filename is {filename}")
     image = base64.b64decode(image_data)
     image = Image.open(io.BytesIO(image))
     # reset annotations
