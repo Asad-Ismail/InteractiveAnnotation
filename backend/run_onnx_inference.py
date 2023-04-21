@@ -37,6 +37,11 @@ predictor = SamPredictor(sam)
 image_embedding=None
 low_res_masks=None
 
+
+def reset_low_res():
+    global low_res_masks
+    low_res_masks=None
+
 def set_image(image):
     global image_embedding
     global low_res_masks
