@@ -39,9 +39,9 @@ low_res_masks=None
 
 def set_image(image):
     global image_embedding
-    #print(f"Setting Image in model!")
+    print(f"Setting Image in model!")
+    low_res_masks=None
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-    #cv2.imwrite("kk.png",image)
     predictor.set_image(image)
     image_embedding = predictor.get_image_embedding().cpu().numpy()
 
@@ -66,6 +66,7 @@ def get_mask(image,point,label):
     "orig_im_size": np.array(image.shape[:2], dtype=np.float32)
     }
     masks, probs, low_res_logits = ort_session.run(None, ort_inputs)
+    low_res_masks=low_res_logits
     masks = masks > predictor.model.mask_threshold
     max_prob=np.argmax(probs)
     mask=masks[max_prob]
