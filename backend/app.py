@@ -149,7 +149,7 @@ def save_annotation():
     json_file="".join(filename.split(".")[:-1])
     pth=os.path.join(output_path,json_file+".json")
     logging.info(f"Output path is {pth}")
-    reset_low_res()
+    #reset_low_res()
     with open(pth, "w") as f:
         json.dump(annotations, f)
     return jsonify({"message": "Annotation saved successfully"}), 200
@@ -217,7 +217,7 @@ def get_annotation():
         }
         annotations.append(annotation)
         annotation_id += 1
-        reset_low_res()
+        #reset_low_res()
     
     combined_mask = np.zeros_like(mask)
     for current_class, current_mask in saved_masks.items():
@@ -232,6 +232,7 @@ def get_annotation():
     return jsonify(response_data)
 
 def process_image_continuous(image, x, y, selected_class):
+    #reset_low_res()
     mask=get_mask(image,[[x,y]],[1])
     # Return the mask (replace this with your actual mask)
     return mask

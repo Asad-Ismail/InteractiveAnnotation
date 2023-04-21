@@ -76,6 +76,7 @@ def get_mask(image,point,label):
     masks, probs, low_res_logits = ort_session.run(None, ort_inputs)
     low_res_masks=low_res_logits
     masks = masks > predictor.model.mask_threshold
+    print(f"original returned masks shape is {masks.shape}")
     max_prob=np.argmax(probs)
     mask=masks[max_prob]
     return mask
