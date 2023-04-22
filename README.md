@@ -73,7 +73,7 @@ Install backend dependencies using pip install -r requirments.txt
 
 ## To-Do List
 
-1. Replace pytorch model with onnx model to speed up annotation (It is actually preferred way to do annotation will be done very soon!)
+1. [In Progress] Replace pytorch model with onnx model to speed up annotation (It is actually preferred way to do annotation will be done very soon!)
 2. Add bounding box as an input 
 3. Add multiple masks proposal in preview mode to show full capabilities of model
 4. Add zoom in and zoom out
