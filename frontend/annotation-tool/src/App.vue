@@ -154,7 +154,10 @@ export default {
             this.$refs.image.onload = () => { // Add this line to set the canvas dimensions when the image is loaded
             this.setCanvasDimensions();
             };
-            this.sendImageToBackend(); // Add this line to send the image to the backend
+            // Check if it's the first image and send it to the backend
+            if (this.imageUrls.length === 1) {
+            this.sendImageToBackend();
+            }
           };
           reader.readAsDataURL(file);
         }
