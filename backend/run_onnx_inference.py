@@ -23,8 +23,7 @@ def show_box(box, ax):
     w, h = box[2] - box[0], box[3] - box[1]
     ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0,0,0,0), lw=2))   
     
-
-
+    
 checkpoint = "sam_vit_h_4b8939.pth"
 model_type = "vit_h"
 sam = sam_model_registry[model_type](checkpoint=checkpoint)
@@ -36,7 +35,7 @@ predictor = SamPredictor(sam)
 
 image_embedding=None
 low_res_masks=None
-
+glblIdx=0
 
 def reset_low_res():
     global low_res_masks
@@ -65,6 +64,7 @@ def get_mask(image,point,label):
     #else:
     onnx_mask_input = np.zeros((1, 1, 256, 256), dtype=np.float32)
     onnx_has_mask_input = np.zeros(1, dtype=np.float32)
+    
     ort_inputs = {
     "image_embeddings": image_embedding,
     "point_coords": onnx_coord,

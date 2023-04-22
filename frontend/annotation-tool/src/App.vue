@@ -247,11 +247,26 @@ export default {
     // Add variables to count the number of mask pixels drawn
     let drawnPixels = 0;
     let totalPixels = 0;
-
+    // Draw saved masks so far
     for (const classKey in segmentationData.saved_masks) {
       const maskData = segmentationData.saved_masks[classKey];
       const classColor = this.classColorMap[classKey] || 'rgba(255, 0, 0, 0.5)';
-
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          const maskX = Math.round(j * scaleX);
+          const maskY = Math.round(i * scaleY);
+          const maskValue = maskData[maskY][maskX];
+          if (maskValue) {
+            ctx.fillStyle = classColor;
+            ctx.fillRect(j, i, 1, 1);
+          }
+        }
+      }
+    }
+    // Draw current Mask
+    for (const classKey in segmentationData.current_mask) {
+      const maskData = segmentationData.current_mask[classKey];
+      const classColor = this.classColorMap[classKey] || 'rgba(255, 0, 0, 0.5)';
       for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
           const maskX = Math.round(j * scaleX);
