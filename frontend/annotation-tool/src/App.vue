@@ -224,7 +224,7 @@ export default {
     {
 
     console.log('maskData:', segmentationData)
-    if (!segmentationData || !segmentationData.saved_masks || Object.keys(segmentationData.saved_masks).length === 0) {
+    if (!segmentationData || !segmentationData.current_mask || Object.keys(segmentationData.current_mask).length === 0) {
     console.error("Segmentation data is empty or undefined");
     return;
     }

@@ -120,20 +120,12 @@ def get_segmentation():
         print("Returning a non-empty mask") 
     # Save the current mask with the class
     current_class = "Stuff"
-    if current_class not in saved_masks:
-        saved_masks[current_class] = mask
-    else:
-        saved_masks[current_class] = np.logical_or(saved_masks[current_class], mask)
-    
-    combined_mask = np.zeros_like(mask)
-    for current_class, current_mask in saved_masks.items():
-        combined_mask = np.logical_or(combined_mask, current_mask)
-    
-    # Convert the saved_masks to a JSON object
-    saved_masks_data = {key: mask.tolist() for key, mask in saved_masks.items()}
+    saved_masks_data = {}
+    current_mask= {current_class:mask.tolist()}
     response_data = {
-        "combined_mask": combined_mask.tolist(),
-        "saved_masks": saved_masks_data
+        #"combined_mask": combined_mask.tolist(),
+        "saved_masks": saved_masks_data,
+        "current_mask": current_mask
     }
     return jsonify(response_data)
         
